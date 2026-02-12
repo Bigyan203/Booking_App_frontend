@@ -14,7 +14,7 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
       return navigate("/auth");
     }
     console.log(user.token);
-    const baseURL = "https://booking-app-backend-4vb9.onrender.com";
+    const baseURL = "https://backend-ko-main-url-rakne-eta";
     const roomUrl = `${baseURL}/rooms/${roomId}/`;
     const userUrl = `${baseURL}/users/${userId}/`;
 
@@ -34,13 +34,13 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
             Authorization: `Token ${user.token}`,
           },
           body: JSON.stringify({
-            room: roomUrl, // Full URL, e.g., /rooms/1/
-            user: userUrl, // Full URL, e.g., /users/2/
+            room: roomUrl, // Full URL rakne kun room ko ho like rooms/1/
+            user: userUrl, // Full rakne, user ko lai diff fdiff /users/2/
             date: currentDate
-              .toLocaleDateString("hu")
+              .toLocaleDateString("de-DE")
               .replace(/\./g, "-")
-              .replace(/\s+/g, "")
-              .slice(0, -1), // Format date as YYYY-MM-DD
+              .replace(/\s+/g, "") // Format date as dd-MM-YYYY
+              //.slice(0, -1), // yo chaidaina
           }),
         });
         console.log(user);
@@ -49,11 +49,11 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
           roomUrl,
           userUrl,
           currentDate
-            .toLocaleDateString("hu")
+            .toLocaleDateString("de-DE")
             .replace(/\./g, "-")
-            .replace(/\s+/g, "")
-            .slice(0, -1)
-        ); // Format date as YYYY-MM-DD)
+            .replace(/\s+/g, "") //mathi ko jstai
+            //.slice(0, -1)
+        ); 
         if (!response.ok) {
           throw new Error("Booking failed");
         }

@@ -7,6 +7,7 @@ import { UserProvider } from './components/UserContext.jsx';
 import AuthForm from './components/AuthForm.jsx';
 import GuestRoute from './components/GuestRoute.jsx';
 import BookingComponent from './components/BookingComponent.jsx';
+import AllRooms from './components/AllRooms.jsx';
 
 const router = createBrowserRouter([
   {
@@ -23,7 +24,14 @@ const router = createBrowserRouter([
         <AuthForm></AuthForm> 
         </GuestRoute>,
 
-    }]
+    },
+    {
+      path: "/all-rooms",
+      element: (
+        <AllRooms>  </AllRooms>
+      )//backend bata data ra room hru taninxa ra fetch hunxa
+    }
+  ]
   },
 ]);
 
