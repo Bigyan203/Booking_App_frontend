@@ -1,0 +1,41 @@
+.occupied-dates-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.month-selection {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.month-title {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.date-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.date-card {
+  background: #f4f6f8;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  font-size: 0.9rem;
+  transition: 0.2s ease;
+}
+
+.date-card:hover {
+  background: #fff;
+  transform: translateY(-2px);
+}
