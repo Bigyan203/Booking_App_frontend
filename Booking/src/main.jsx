@@ -8,31 +8,35 @@ import AuthForm from './components/AuthForm.jsx';
 import GuestRoute from './components/GuestRoute.jsx';
 import BookingComponent from './components/BookingComponent.jsx';
 import AllRooms from './components/AllRooms.jsx';
+import OccupiedDatesDisplay from './components/OccupiedDatesDisplay.jsx';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App> </App>,
     children: [
-      {path: "/", element: <BookingComponent></BookingComponent>},   
-      {  
-        path: "/auth",
-        element: (
-          <GuestRoute> 
-          <AuthForm></AuthForm> 
-          </GuestRoute>
-        ),
-      },  
-      {
-        path: "/all-rooms",
-        element:  <AllRooms></AllRooms>
-        //backend bata data ra room hru taninxa ra fetch hunxa
-      },
-      {
-        path: "/my-bookings",
-        element: <OccupiedDatesDisplay></OccupiedDatesDisplay>,
-      }
-    ],
+      {path: "/", element: <BookingComponent>
+
+      </BookingComponent>},
+    
+    {  
+      path: "/auth",
+      element: <GuestRoute> 
+        <AuthForm></AuthForm> 
+        </GuestRoute>,
+
+    },
+    {
+      path: "/all-rooms",
+      element: (
+        <AllRooms>  </AllRooms>
+      )//backend bata data ra room hru taninxa ra fetch hunxa
+    },
+    {
+      path: "/my-bookings",
+      element: <OccupiedDatesDisplay></OccupiedDatesDisplay>
+    }
+  ]
   },
 ]);
 
