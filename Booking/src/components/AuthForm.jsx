@@ -26,7 +26,7 @@ const AuthForm = () => {
     let userData = formData;
     try {
       const response = await fetch(
-        "http://Backend-ko-login-rakne-eta/login/",
+        "http://localhost:8000/login/",
         {
           method: "POST",
           headers: {
@@ -59,7 +59,7 @@ const AuthForm = () => {
     let userData = formData;
     try {
       const response = await fetch(
-        "http://Backend-ko-register-rakne-eta/register/",
+        "http://localhost:8000/register/",
         {
           method: "POST",
           headers: {

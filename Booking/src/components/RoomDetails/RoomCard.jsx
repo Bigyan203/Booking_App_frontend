@@ -14,7 +14,7 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
       return navigate("/auth");
     }
     console.log(user.token);
-    const baseURL = "https://backend-ko-main-url-rakne-eta";
+    const baseURL = "http://localhost:8000";
     const roomUrl = `${baseURL}/rooms/${roomId}/`;
     const userUrl = `${baseURL}/users/${userId}/`;
 
@@ -27,7 +27,9 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
       currentDate.setDate(currentDate.getDate() + 1)
     ) {
       try {
-        const response = await fetch(`${baseURL}/occupied-dates/`, {
+        const isoDate = currentDate.toISOString().split("T")[0];
+
+        const response = await fetch(`${baseURL}/occupied_dates/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -36,10 +38,10 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
           body: JSON.stringify({
             room: roomUrl, // Full URL rakne kun room ko ho like rooms/1/
             user: userUrl, // Full rakne, user ko lai diff fdiff /users/2/
-            date: currentDate
-              .toLocaleDateString("de-DE")
-              .replace(/\./g, "-")
-              .replace(/\s+/g, "") // Format date as dd-MM-YYYY
+            date: isoDate
+              //.toLocaleDateString("hu")
+              //.replace(/\./g, "-")
+              //.replace(/\s+/g, "") // Format date as dd-MM-YYYY
               //.slice(0, -1), // yo chaidaina
           }),
         });
@@ -48,11 +50,11 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
         console.log(
           roomUrl,
           userUrl,
-          currentDate
-            .toLocaleDateString("de-DE")
-            .replace(/\./g, "-")
-            .replace(/\s+/g, "") //mathi ko jstai
-            //.slice(0, -1)
+          isoDate
+           // .toLocaleDateString("hu")
+           // .replace(/\./g, "-")
+           // .replace(/\s+/g, "") //mathi ko jstai
+           // .slice(0, -1)
         ); 
         if (!response.ok) {
           throw new Error("Booking failed");
