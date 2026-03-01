@@ -22,7 +22,7 @@ const BookingComponent = ({ currentUser }) => {
     async function fetchRoomData() {
       try {
         const response = await fetch(
-          "https://backend-ko-roomdata-ko-page/rooms/",
+          "http://localhost:8000/rooms/",
           {
             method: "GET",
           }
@@ -157,9 +157,8 @@ const BookingComponent = ({ currentUser }) => {
     };
 
     const availableRooms = roomData.filter((room) =>
-      room.occupiedDates.every((occ) => !isDateInRange(occ.date))
-    );
-
+        (room.occupied_dates || []).every((occ) =>!isDateInRange(occ.date))
+        );
     setFilteredRooms(availableRooms);
     setIsFiltered(true);
     setError("");

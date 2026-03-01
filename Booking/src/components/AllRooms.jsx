@@ -10,7 +10,7 @@ const AllRooms = () => {
     async function fetchRoomData() {
       try {
         const response = await fetch(
-          "https://backend-ko-roomdata-ko-page/rooms/",
+          "http://localhost:8000/rooms/",
           {
             method: "GET",
           }

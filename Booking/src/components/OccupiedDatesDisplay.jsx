@@ -12,10 +12,10 @@ const OccupiedDatesDisplay = () => {
       return;
     }
 
-    const baseURL = "https://backend-base-url.com";
+    const baseURL = "http://localhost:8000";
     async function fetchDates() {
       try {
-        const response = await fetch(`${baseURL}/occupied-dates/`, {
+        const response = await fetch(`${baseURL}/occupied_dates/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ const OccupiedDatesDisplay = () => {
             return; // Skip invalid dates
           }
 
-          const month = date.toLocaleString("hu", {
+          const month = date.toLocaleString("en-GB", {
             month: "long",
             year: "numeric",
           });
@@ -117,8 +117,8 @@ const OccupiedDatesDisplay = () => {
             {groupedDates[month].map((range, index) => (
               <div key={index} className="date-card">
                 <p className="date-range">
-                  {new Date(range.startDate).toLocaleDateString("hu")} -{" "}
-                  {new Date(range.endDate).toLocaleDateString("hu")}
+                  {new Date(range.startDate).toLocaleDateString("en-GB")} -{" "}
+                  {new Date(range.endDate).toLocaleDateString("en-GB")}
                 </p>
               </div>
             ))}
