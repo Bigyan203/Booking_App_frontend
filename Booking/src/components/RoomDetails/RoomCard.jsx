@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import RoomImageSlider from "./RoomImageSlider";
 import RoomInfo from "./Roominfo";
 
@@ -9,6 +9,7 @@ import { redirect, useNavigate } from "react-router-dom";
 const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const [bookingError, setBookingError] = useState("");
   const handleBooking = async (roomId, userId, selectedDateRange) => {
     if (!user) {
       return navigate("/auth");
@@ -27,7 +28,7 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
       currentDate.setDate(currentDate.getDate() + 1)
     ) {
       try {
-        const isoDate = currentDate.toISOString().split("T")[0];
+        const isoDate = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000).toISOString().split("T")[0];
 
         const response = await fetch(`${baseURL}/occupied_dates/`, {
           method: "POST",
@@ -57,13 +58,22 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
            // .slice(0, -1)
         ); 
         if (!response.ok) {
-          throw new Error("Booking failed");
+          console.log("Booking failed with status:", response.status);
+          console.log("Response:", response);
+          if (response.status === 409 || response.status === 400) {
+            throw new Error("This room is already booked for the selected dates.");
+          } else {
+            throw new Error("Booking failed. Please try again.");
+          }
         }
         const data = await response.json(); // Parse the JSON response
         onBookingSuccess();
         console.log("Booking successful:", data);
       } catch (error) {
         console.error("Error during booking:", error);
+        setBookingError(error.message);
+        // Clear error after 5 seconds
+        setTimeout(() => setBookingError(""), 5000);
       }
     }
   };
@@ -71,16 +81,26 @@ const RoomCard = ({ room, selectedDateRange, onBookingSuccess }) => {
     <div className="room-card">
       <RoomImageSlider images={room.images} />
       <RoomInfo room={room} />
+      {bookingError && <div className="booking-error">{bookingError}</div>}
       {selectedDateRange ? (
-        <button
-          className="book-room-button"
-          onClick={() =>
-            handleBooking(room.id, user.user.id, selectedDateRange)
-          }
-          disabled={!selectedDateRange.startDate}
-        >
-          Book Room
-        </button>
+        user ? (
+          <button
+            className="book-room-button"
+            onClick={() =>
+              handleBooking(room.id, user.user.id, selectedDateRange)
+            }
+            disabled={!selectedDateRange.startDate}
+          >
+            Book Room
+          </button>
+        ) : (
+          <button
+            className="book-room-button"
+            onClick={() => navigate("/auth")}
+          >
+            Login to Book
+          </button>
+        )
       ) : null}
     </div>
   );

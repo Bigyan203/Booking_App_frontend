@@ -75,3 +75,13 @@
   font-style: italic;
   color: #888;
 }
+
+.booking-error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 8px 16px;
+  border: 1px solid #ffcdd2;
+  font-weight: 500;
+}
