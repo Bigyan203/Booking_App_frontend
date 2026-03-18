@@ -15,7 +15,7 @@ const OccupiedDatesDisplay = () => {
     const baseURL = "http://localhost:8000";
     async function fetchDates() {
       try {
-        const response = await fetch(`${baseURL}/occupied_dates/`, {
+        const response = await fetch(`${baseURL}/occupied_dates/?user=${user.user.id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -39,70 +39,100 @@ const OccupiedDatesDisplay = () => {
     async function processAndSetDates() {
       const fetchedDates = await fetchDates(); // Wait for fetchDates to resolve
 
-      // Process dates into grouped ranges
-      const processDates = (dates) => {
-        // Extract only the date strings
-        const dateStrings = dates.map((entry) => entry.date);
+      // Process dates into grouped ranges by room
+      const processDates = async (dates) => {
+        // Group dates by room first
+        const datesByRoom = {};
+        
+        for (const entry of dates) {
+          const roomId = entry.room.split('/').slice(-2)[0]; // Extract room ID from URL
+          
+          if (!datesByRoom[roomId]) {
+            // Fetch room details
+            try {
+              const roomResponse = await fetch(entry.room, {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Token ${user.token}`,
+                },
+              });
+              const roomData = await roomResponse.json();
+              datesByRoom[roomId] = {
+                roomName: roomData.name,
+                dates: []
+              };
+            } catch (error) {
+              console.error("Error fetching room:", error);
+              datesByRoom[roomId] = {
+                roomName: `Room ${roomId}`,
+                dates: []
+              };
+            }
+          }
+          
+          datesByRoom[roomId].dates.push(entry.date);
+        }
 
-        // Ensure dates are sorted chronologically
-        const sortedDates = dateStrings.sort();
-
+        // Now create ranges for each room
         const ranges = {};
-        let currentMonth = "";
-        let currentRange = null;
-
-        sortedDates.forEach((dateStr) => {
-          // Parse the date explicitly to ensure it's valid
-          const date = new Date(`${dateStr}T00:00:00`); // Add `T00:00:00` to avoid parsing issues
-
-          if (isNaN(date.getTime())) {
-            console.error("Invalid date:", dateStr);
-            return; // Skip invalid dates
-          }
-
-          const month = date.toLocaleString("en-GB", {
-            month: "long",
-            year: "numeric",
-          });
-
-          if (month !== currentMonth) {
-            // If month changes, finalize the previous range
-            if (currentRange) {
-              if (!ranges[currentMonth]) ranges[currentMonth] = [];
-              ranges[currentMonth].push(currentRange);
+        
+        for (const [roomId, roomInfo] of Object.entries(datesByRoom)) {
+          const sortedDates = roomInfo.dates.sort();
+          
+          let currentRange = null;
+          
+          sortedDates.forEach((dateStr) => {
+            const date = new Date(`${dateStr}T00:00:00`);
+            
+            if (isNaN(date.getTime())) {
+              console.error("Invalid date:", dateStr);
+              return;
             }
-            currentMonth = month;
-            currentRange = { startDate: dateStr, endDate: dateStr };
-          } else {
-            // Check if the date is consecutive
-            const prevDate = new Date(`${currentRange.endDate}T00:00:00`);
-            prevDate.setDate(prevDate.getDate() + 1); // Add 1 day to check continuity
 
-            if (
-              date.toISOString().split("T")[0] ===
-              prevDate.toISOString().split("T")[0]
-            ) {
-              // Extend the current range
-              currentRange.endDate = dateStr;
+            const month = date.toLocaleString("en-GB", {
+              month: "long",
+              year: "numeric",
+            });
+
+            if (!ranges[month]) ranges[month] = [];
+            
+            if (!currentRange || currentRange.roomId !== roomId) {
+              // Start new range for this room
+              currentRange = { 
+                startDate: dateStr, 
+                endDate: dateStr, 
+                roomName: roomInfo.roomName,
+                roomId: roomId
+              };
+              ranges[month].push(currentRange);
             } else {
-              // Finalize the current range and start a new one
-              if (!ranges[currentMonth]) ranges[currentMonth] = [];
-              ranges[currentMonth].push(currentRange);
-              currentRange = { startDate: dateStr, endDate: dateStr };
+              // Check if date is consecutive
+              const prevDate = new Date(`${currentRange.endDate}T00:00:00`);
+              prevDate.setDate(prevDate.getDate() + 1);
+              
+              if (date.toISOString().split("T")[0] === prevDate.toISOString().split("T")[0]) {
+                // Extend current range
+                currentRange.endDate = dateStr;
+              } else {
+                // Start new range for same room
+                currentRange = { 
+                  startDate: dateStr, 
+                  endDate: dateStr, 
+                  roomName: roomInfo.roomName,
+                  roomId: roomId
+                };
+                ranges[month].push(currentRange);
+              }
             }
-          }
-        });
-
-        // Finalize the last range
-        if (currentRange) {
-          if (!ranges[currentMonth]) ranges[currentMonth] = [];
-          ranges[currentMonth].push(currentRange);
+          });
         }
 
         return ranges;
       };
 
-      setGroupedDates(processDates(fetchedDates));
+      const processedRanges = await processDates(fetchedDates);
+      setGroupedDates(processedRanges);
     }
 
     processAndSetDates(); // Fetch and process dates
@@ -117,8 +147,11 @@ const OccupiedDatesDisplay = () => {
             {groupedDates[month].map((range, index) => (
               <div key={index} className="date-card">
                 <p className="date-range">
-                  {new Date(range.startDate).toLocaleDateString("en-GB")} -{" "}
-                  {new Date(range.endDate).toLocaleDateString("en-GB")}
+                  {new Date(range.startDate).toLocaleDateString("en-GB")}
+                  {range.startDate !== range.endDate && ` - ${new Date(range.endDate).toLocaleDateString("en-GB")}`}
+                </p>
+                <p className="room-name">
+                  {range.roomName}
                 </p>
               </div>
             ))}

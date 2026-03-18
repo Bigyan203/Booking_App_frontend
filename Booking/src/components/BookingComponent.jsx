@@ -50,12 +50,23 @@ const BookingComponent = ({ currentUser }) => {
       day
     );
 
+    // If clicking the same startDate, unselect it
+    if (selectedDate.getTime() === selectedDates.startDate?.getTime() && !selectedDates.endDate) {
+      setSelectedDates({ startDate: null, endDate: null });
+      setError("");
+      return;
+    }
+
+    // If clicking the same endDate, unselect it
+    if (selectedDate.getTime() === selectedDates.endDate?.getTime()) {
+      setSelectedDates({ ...selectedDates, endDate: null });
+      setError("");
+      return;
+    }
+
     if (!selectedDates.startDate || selectedDates.endDate) {
       // If no dates are selected or both are already set, reset to a single date
       setSelectedDates({ startDate: selectedDate, endDate: null });
-    } else if (selectedDate.getTime() === selectedDates.startDate.getTime()) {
-      // If clicking the same date again, treat as a single-day selection
-      setSelectedDates({ startDate: selectedDate, endDate: selectedDate });
     } else {
       // Set the endDate if selecting a valid range
       if (selectedDate > selectedDates.startDate) {

@@ -1,14 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 import { UserContext } from "./UserContext";
 const Navbar = () => {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  
   function handleLogout() {
     localStorage.removeItem("user");
     setUser(null);
     navigate("/");
+    setShowDropdown(false);
   }
   return (
     <nav className="navbar">
@@ -30,8 +33,20 @@ const Navbar = () => {
             <Link to="auth">Login</Link>
           </li>
         ) : (
-          <li className="logout" onClick={handleLogout}>
-            Logout
+          <li className="user-dropdown">
+            <button 
+              className="user-button"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              {user.user.full_name || user.user.username || user.user.email}
+            </button>
+            {showDropdown && (
+              <div className="dropdown-menu">
+                <button className="logout-btn" onClick={handleLogout}>
+                  Logout
+                </button>
+              </div>
+            )}
           </li>
         )}
       </ul>
